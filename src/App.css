@@ -1,0 +1,63 @@
+/* App.css */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  background-color: #4c4cff;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.main {
+  flex-grow: 1;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.footer {
+  background-color: #4c4cff;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.home {
+  text-align: center;
+}
+
+.home h1 {
+  color: #4c4cff;
+  font-size: 24px;
+}
+
+.home p {
+  color: #333;
+}
