@@ -19,7 +19,10 @@ function Tasks() {
         id: doc.id,
         ...doc.data(),
       }));
-      setTasks(taskList);
+
+      // Sort tasks by deadline (closest first)
+      const sortedTasks = taskList.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+      setTasks(sortedTasks);
     };
 
     fetchTasks();
@@ -36,7 +39,11 @@ function Tasks() {
     const newTask = { name: taskName, deadline: deadline };
     const docRef = await addDoc(tasksCollection, newTask);
 
-    setTasks([...tasks, { id: docRef.id, ...newTask }]);
+    setTasks((prevTasks) => {
+      const updatedTasks = [...prevTasks, { id: docRef.id, ...newTask }];
+      // Sort tasks after adding new one
+      return updatedTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    });
     setTaskName('');
     setDeadline('');
     alert('Task created successfully');
@@ -46,7 +53,11 @@ function Tasks() {
   const handleDeleteTask = async (taskId) => {
     const taskDoc = doc(firestore, 'tasks', taskId);
     await deleteDoc(taskDoc);
-    setTasks(tasks.filter((task) => task.id !== taskId));
+    setTasks((prevTasks) => {
+      const updatedTasks = prevTasks.filter((task) => task.id !== taskId);
+      // Sort tasks after deletion
+      return updatedTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    });
     alert('Task deleted successfully');
   };
 
@@ -63,13 +74,15 @@ function Tasks() {
       deadline: updateTaskDeadline,
     });
 
-    setTasks(
-      tasks.map((task) =>
+    setTasks((prevTasks) => {
+      const updatedTasks = prevTasks.map((task) =>
         task.id === updateTaskId
           ? { ...task, name: updateTaskName, deadline: updateTaskDeadline }
           : task
-      )
-    );
+      );
+      // Sort tasks after update
+      return updatedTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    });
 
     setUpdateTaskId('');
     setUpdateTaskName('');
