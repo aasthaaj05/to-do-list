@@ -7,7 +7,6 @@ function Tasks() {
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState('');
   const [updateTaskId, setUpdateTaskId] = useState('');
-  const [updateTaskName, setUpdateTaskName] = useState('');
   const [updateTaskDeadline, setUpdateTaskDeadline] = useState('');
 
   // Fetch tasks from Firestore
@@ -41,7 +40,6 @@ function Tasks() {
 
     setTasks((prevTasks) => {
       const updatedTasks = [...prevTasks, { id: docRef.id, ...newTask }];
-      // Sort tasks after adding new one
       return updatedTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
     });
     setTaskName('');
@@ -55,126 +53,115 @@ function Tasks() {
     await deleteDoc(taskDoc);
     setTasks((prevTasks) => {
       const updatedTasks = prevTasks.filter((task) => task.id !== taskId);
-      // Sort tasks after deletion
       return updatedTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
     });
     alert('Task deleted successfully');
   };
 
-  // Update a task
+  // Update a task's deadline
   const handleUpdateTask = async () => {
-    if (!updateTaskName.trim() || !updateTaskDeadline.trim()) {
-      alert('Please provide both updated task name and deadline');
+    if (!updateTaskDeadline.trim()) {
+      alert('Please provide an updated deadline');
       return;
     }
 
     const taskDoc = doc(firestore, 'tasks', updateTaskId);
     await updateDoc(taskDoc, {
-      name: updateTaskName,
       deadline: updateTaskDeadline,
     });
 
     setTasks((prevTasks) => {
       const updatedTasks = prevTasks.map((task) =>
-        task.id === updateTaskId
-          ? { ...task, name: updateTaskName, deadline: updateTaskDeadline }
-          : task
+        task.id === updateTaskId ? { ...task, deadline: updateTaskDeadline } : task
       );
-      // Sort tasks after update
       return updatedTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
     });
 
     setUpdateTaskId('');
-    setUpdateTaskName('');
     setUpdateTaskDeadline('');
-    alert('Task updated successfully');
+    alert('Task deadline updated successfully');
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-6">Task Management</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6 space-y-6">
+        <h1 className="text-2xl font-bold text-center text-indigo-600">Task Management</h1>
 
-      {/* List of Tasks */}
-      <div className="w-full max-w-md mb-6">
-        {tasks.length > 0 ? (
-          tasks.map((task) => (
-            <div
-              key={task.id}
-              className="flex justify-between items-center p-4 bg-white rounded shadow mb-4"
-            >
-              <div>
-                <p className="font-semibold">{task.name}</p>
-                <p className="text-sm text-gray-500">Deadline: {task.deadline}</p>
-              </div>
-              <button
-                onClick={() => handleDeleteTask(task.id)}
-                className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+        {/* Task List */}
+        <div className="space-y-4">
+          {tasks.length > 0 ? (
+            tasks.map((task) => (
+              <div
+                key={task.id}
+                className="flex justify-between items-center p-4 bg-gray-50 rounded shadow"
               >
-                Delete
-              </button>
-            </div>
-          ))
-        ) : (
-          <p>No tasks found</p>
-        )}
-      </div>
+                <div>
+                  <p className="font-semibold text-gray-800">{task.name}</p>
+                  <p className="text-sm text-gray-500">Deadline: {task.deadline}</p>
+                </div>
+                <button
+                  onClick={() => handleDeleteTask(task.id)}
+                  className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No tasks found</p>
+          )}
+        </div>
 
-      {/* Create Task */}
-      <div className="w-full max-w-md mb-4">
-        <input
-          type="text"
-          placeholder="Task Name"
-          value={taskName}
-          onChange={(e) => setTaskName(e.target.value)}
-          className="w-full px-4 py-2 border rounded mb-2 focus:outline-none"
-        />
-        <input
-          type="date"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          className="w-full px-4 py-2 border rounded focus:outline-none"
-        />
-        <button
-          onClick={handleCreateTask}
-          className="w-full mt-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-        >
-          Create New Task
-        </button>
-      </div>
+        {/* Create Task */}
+        <div className="space-y-2">
+          <input
+            type="text"
+            placeholder="Task Name"
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          />
+          <input
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          />
+          <button
+            onClick={handleCreateTask}
+            className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+          >
+            Create Task
+          </button>
+        </div>
 
-      {/* Update Task */}
-      <div className="w-full max-w-md">
-        <select
-          value={updateTaskId}
-          onChange={(e) => setUpdateTaskId(e.target.value)}
-          className="w-full px-4 py-2 mb-2 border rounded focus:outline-none"
-        >
-          <option value="">Select a task to update</option>
-          {tasks.map((task) => (
-            <option key={task.id} value={task.id}>
-              {task.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          placeholder="Updated Task Name"
-          value={updateTaskName}
-          onChange={(e) => setUpdateTaskName(e.target.value)}
-          className="w-full px-4 py-2 border rounded focus:outline-none"
-        />
-        <input
-          type="date"
-          value={updateTaskDeadline}
-          onChange={(e) => setUpdateTaskDeadline(e.target.value)}
-          className="w-full px-4 py-2 border rounded focus:outline-none"
-        />
-        <button
-          onClick={handleUpdateTask}
-          className="w-full mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-        >
-          Update Task
-        </button>
+        {/* Update Task */}
+        <div className="space-y-2">
+          <select
+            value={updateTaskId}
+            onChange={(e) => setUpdateTaskId(e.target.value)}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
+          >
+            <option value="">Select a task to update</option>
+            {tasks.map((task) => (
+              <option key={task.id} value={task.id}>
+                {task.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="date"
+            value={updateTaskDeadline}
+            onChange={(e) => setUpdateTaskDeadline(e.target.value)}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
+          />
+          <button
+            onClick={handleUpdateTask}
+            className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            Update Deadline
+          </button>
+        </div>
       </div>
     </div>
   );
