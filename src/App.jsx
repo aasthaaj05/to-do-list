@@ -3,6 +3,7 @@ import Signup from './components/SignUp';
 import Login from './components/SignIn';
 import Dashboard from './components/Dashboard';
 import './App.css';
+import Tasks from './components/Tasks';
 import HomePage from './components/HomePage'; 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/tasks" element={<Tasks />} />
           </Routes>
     </Router>
   );

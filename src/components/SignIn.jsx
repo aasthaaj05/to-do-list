@@ -1,15 +1,19 @@
 import { useState } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { auth } from './../firebase';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // Initialize navigate
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await auth.signInWithEmailAndPassword(email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       alert('Login successful!');
+      navigate('/tasks'); // Redirect to the task management page
     } catch (error) {
       alert(error.message);
     }

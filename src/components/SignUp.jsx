@@ -1,26 +1,28 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { auth, firestore } from './../firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth'; // Firebase v9+ import for signup
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('user'); // Default role is 'user'
+  const [role, setRole] = useState('user');
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      // Use the modular Firebase method
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Add role to Firestore (default role as 'user')
-      await firestore.collection('users').doc(user.uid).set({
+      await setDoc(doc(firestore, 'users', user.uid), {
         email: user.email,
-        role: role, // role is stored here
+        role: role,
       });
 
       alert('Signup successful!');
+      navigate('/login'); // Redirect to login page
     } catch (error) {
       alert(error.message);
     }
